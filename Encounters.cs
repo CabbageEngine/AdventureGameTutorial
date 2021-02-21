@@ -2,7 +2,7 @@
 
 namespace TextAdventure
 {
-    class Encounters
+    public class Encounters
     {
         // Best practice to create a single instance of Random and use it throughout program
         //      otherwise results may not seem as random
@@ -14,15 +14,14 @@ namespace TextAdventure
         // Encounters
         public static void FirstEncounter()
         {
-            Console.WriteLine("You throw open the door, charging towards the figure of your " +
-                "presumed captor. The ambient light from the hallway floods the opening " +
-                "of the door. As your body emerges from the silhouetted passage, you spy " +
-                "a rusty nail embedded in the exterior frame of the door. You grab one end " +
-                "of the nail by tossing your hand over your shoulder and using your momentum " +
-                "to pull the nail out. A process that offered no resistance but was quite " +
-                "dramatic to witness.");
-            Console.WriteLine("The sound of the door being flung open grabs the attention of " +
-                "the rear-facing figure. They begin to turn towards the direction of the sound.");
+            Console.WriteLine(" You throw open the door and charge towards the figure of your\n " +
+                "captor. The ambient light from the hallway floods the opening of the door. \n" +
+                " As your body emerges from the silhouetted passage, you spy a feather duster \n" +
+                " laying on a chair nearby. In one effortless move, you grab the cleaning utensil\n " +
+                "and hold it high in the air like an imaginary sword.\n");
+            Console.WriteLine(" The sound of the door being flung open and what could only be\n " +
+                "described as the distressed warblings of a turkey quickly draws the guard's\n " +
+                "attention. They turn to face you with a broad, toothy grin. \n");
             Console.ReadKey();
 
             // Set combat to not initiate first, set string name, power of 1 and health of 4
@@ -30,8 +29,43 @@ namespace TextAdventure
 
         }
 
+        public static void BasicFightEncounter()
+        {
+            Console.Clear();
+            Console.WriteLine(" You turn the corner and there you see another challenger...");
+            Console.ReadKey();
+            Combat(true, "", 0, 0);
+        }
+
+        public static void WizardEncounter()
+        {
+            Console.Clear();
+            Console.WriteLine(" The door creaks open as you force your eyeball past its sockets to\n " +
+                "peek past the tiny opening. You spy an old man stroking his beard and murmuring\n " +
+                "delightfully to himself.\n");
+            Console.WriteLine(" Suddenly, he stands to face you, wiping his hands on his wizard robe\n " +
+                "while mutttering about finding \"privacy\" and problems with people rushing to\n " +
+                "judgement.\n");
+            Console.WriteLine(" You get ready to face a Dark Wizard with a bruised ego.\n");
+            Console.ReadKey();
+            Combat(false, "Dark Wizard", 4, 2);
+        }
 
         // Encounter Tools
+
+        public static void RandomEncounter()
+        {
+            switch (rand.Next(0, 2))
+            {
+                case 0:
+                    BasicFightEncounter();
+                    break;
+                case 1:
+                    WizardEncounter();
+                    break;
+            }
+        }
+
         // Stored in Player.cs class. Combat interaction
         public static void Combat(bool random, string name, int power, int health)
         {
@@ -40,7 +74,11 @@ namespace TextAdventure
             int h = 0;
             if (random)
             {
-
+                n = GetName();
+                // p = rand.Next(1, 5); - deprecated code
+                p = Program.currentPlayer.GetPower();
+                // h = rand.Next(1, 8); - deprecated code
+                h = Program.currentPlayer.GetHealth();
             }
             else
             {
@@ -52,10 +90,13 @@ namespace TextAdventure
             // Starting while loop for menu and combat
             while (h > 0)
             {
-                // Menu display output
                 Console.Clear();
+
+                // Display enemy target and stats
                 Console.WriteLine(n);
                 Console.WriteLine(p + "/" + h);
+
+                // Menu display ascii 
                 Console.WriteLine("======================");
                 Console.WriteLine("| (A)ttack (D)efend  |");
                 Console.WriteLine("|   (R)un  (H)eal    |");
@@ -68,30 +109,32 @@ namespace TextAdventure
                 if (input.ToLower() == "a" || input.ToLower() == "attack")
                 {
                     // Attack exchange
-                    Console.WriteLine("With haste you surge foward with your nail. " +
-                        "As you pass, the " + n + " strikes you as you enter their range.");
+                    Console.WriteLine(" With haste you surge foward with your feather duster.\n " +
+                        "As you draw closer, the " + n + " was able to grope you. You squeal out!\n");
                     int damage = p - Program.currentPlayer.armorValue;
 
                     // If damage is scored but results in negative damage
                     if (damage < 0)
                         damage = 0;
 
-                    // 
+                    // Calculating damage scored vs weapon value 
                     int attack = rand.Next(0, Program.currentPlayer.weaponValue) + rand.Next(1, 4);
-                    Console.WriteLine("You lose" + damage + " health and deal " + attack + "");
+                    Console.WriteLine(" You lose " + damage + " health and deal " + attack + " damage.");
                     Program.currentPlayer.health -= damage;
                     h -= attack;
                 }
                 else if (input.ToLower() == "d" || input.ToLower() == "defend")
                 {
                     // defend
-                    Console.WriteLine("As the " + n + " prepares to strike you as you pass. " +
-                        "You ready your sword in a defensive stance");
+                    Console.WriteLine(" As the " + n + " prepares to strike, you assume a\n " +
+                        "wide stance. You hold your feather duster in front of you defensively.\n");
+
+                    // Calculating damage received mitigated by armor Value
                     int damage = (p / 4) - Program.currentPlayer.armorValue;
                     if (damage < 0)
                         damage = 0;
-                    int attack = rand.Next(0, Program.currentPlayer.weaponValue) / 2;
-                    Console.WriteLine("You lose" + damage + " health and deal " + attack + "");
+                    int attack = rand.Next(0, Program.currentPlayer.weaponValue) + rand.Next(1, 4) / 2;
+                    Console.WriteLine("You lose " + damage + " health and deal " + attack + " damage.");
                     Program.currentPlayer.health -= damage;
                     h -= attack;
                 }
@@ -100,54 +143,95 @@ namespace TextAdventure
                     // run
                     if (rand.Next(0, 2) == 0)
                     {
-                        Console.WriteLine("As you sprint away from the " + n + ", it catches you" +
-                            " in the back sending you sprawling to the ground.");
+                        Console.WriteLine(" As you sprint away from the " + n + ", it catches you\n" +
+                            " in the rear sending you sprawling to the ground. You bruise your knees.\n");
                         int damage = p - Program.currentPlayer.armorValue;
                         if (damage < 0)
                             damage = 0;
-                        Console.WriteLine("You lose " + damage + " health and are unable to escape.");
+                        Console.WriteLine("You lose " + damage + " health and are unable to escape.\n");
+                        Program.currentPlayer.health -= damage;
                         Console.ReadKey();
                     }
                     else
                     {
-                        Console.WriteLine("You use your crazy ninja moves to evade the " +
-                            name + " and you successfully escape!");
+                        Console.WriteLine(" Using an expertly practiced bunny hop and twirl, you evade the\n " +
+                            n + " and successfully escape!\n");
                         Console.ReadKey();
                         // go to store
+                        Shop.LoadShop(Program.currentPlayer);
 
                     }
                 }
                 else if (input.ToLower() == "h" || input.ToLower() == "heal")
                 {
-                    // heal
+                    // health
                     if (Program.currentPlayer.potions == 0)
                     {
-                        Console.WriteLine("You try in vain to find a potion but your bag is empty.");
+                        Console.WriteLine(" You try in vain to find a potion, but your bag is empty.\n");
                         int damage = p - Program.currentPlayer.armorValue;
                         if (damage < 0)
                             damage = 0;
-                        Console.WriteLine("The " + n + " pokes you with something long, causing a " +
-                            "loss of " + damage + " health!");
+                        Console.WriteLine(" The " + n + " pokes you with something long and fleshy, causing a " +
+                            "loss of " + damage + " health!\n");
+                        Program.currentPlayer.health -= damage;
+
                     }
                     else
                     {
-                        Console.WriteLine("You reach into your bag and pull out a glowing, purple" +
-                            " Flask. You drink its purple contents.");
-                        int potionV = 5;
+                        Console.WriteLine(" You reach into your bag and pull out a purple liquid contained in a" +
+                            " flask. You drink\n its purple contents and contemplate the life of DJ Screw.\n");
+                        int potionV = rand.Next(2, 6);
                         Console.WriteLine("You gain " + potionV + " health");
                         Program.currentPlayer.health += potionV;
-                        Console.WriteLine("While you were occupied, the " + n + " makes a move.");
-                        int damage = p - Program.currentPlayer.armorValue;
+                        Program.currentPlayer.potions -= 1;
+
+                        // If you drink a health potion, you receive one attack from enemy
+                        Console.WriteLine("While you were occupied, the " + n + " makes a move.\n");
+
+                        // Setting damage received to be  half of what is incurred. 
+                        int damage = p / 2 - Program.currentPlayer.armorValue;
                         if (damage < 0)
                             damage = 0;
-                        Console.WriteLine("Using its probing fingers, the " + n +
-                            " touches you in your special place causing " + damage + " to health!");
+                        Console.WriteLine(" Using its probing fingers, the " + n +
+                            " touches you in your special place causing " + damage + " damage to health!\n");
+                        Program.currentPlayer.health -= damage;
+
                     }
                     Console.ReadKey();
                 }
+                if (Program.currentPlayer.health <= 0)
+                {
+                    // Death code
+                    Console.WriteLine(" The " + n + " stands above you victorious. The last thing you see is the\n " +
+                        n + "'s probing, beady eyes relishing the delights that is to come next. You have fainted.\n");
+                    Console.ReadKey();
+                    System.Environment.Exit(0);
 
+                }
                 Console.ReadKey();
             }
+            // int c = rand.Next(10, 50); - deprecated code
+            int c = Program.currentPlayer.GetCoins();
+            Console.WriteLine(" As you stand victorious over the " + name + ", it's body dissolves\n " +
+                "into a putrid, pink mist, leaving behind gold " + c + " coins on the ground.");
+            Program.currentPlayer.coins += c;
+            Console.ReadKey();
+        }
+
+        public static string GetName()
+        {
+            switch (rand.Next(0, 4))
+            {
+                case 0:
+                    return "Skeleton";
+                case 1:
+                    return "Zombie";
+                case 2:
+                    return "Cultist";
+                case 3:
+                    return "Grave Robber";
+            }
+            return "Human Rogue";
         }
     }
 }
